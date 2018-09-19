@@ -6,7 +6,7 @@ import Adafruit_DHT
 import numpy as np
 import datetime as dt
 import RPi.GPIO as GPIO
-
+import signal
 
 ## Setup
 TEMPERATURE_PIN = 4
@@ -28,8 +28,22 @@ GPIO.output(WARMER_PIN, GPIO.LOW)
 def read_temperature():
     return Adafruit_DHT.read_retry(DHT_VERSION, TEMPERATURE_PIN)
 
+def exit_gracefully(signum, frame):
+    # In case we get another SIGINT signal during this function
+    signal.signal(signal.SIGINT, original_sigint)
+
+    # Turn off the used GPIO pins
+    GPIO.output(WARMER_PIN, GPIO.LOW)
+
+    print('\nBye bye :)')
+    sys.exit(1)
 
 ## Main
+
+# replace SIGINT handler
+original_sigint = signal.getsignal(signal.SIGINT)
+signal.signal(signal.SIGINT, exit_gracefully)
+
 print('DateTime', 'Temperature[C]','Humidity[%]', sep=PRINT_SEPARATOR)
 while True:
 

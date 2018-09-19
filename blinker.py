@@ -32,7 +32,7 @@ original_sigint = signal.getsignal(signal.SIGINT)
 signal.signal(signal.SIGINT, exit_gracefully)
 
 ## Main
-toggle = False
+toggle = True
 while True:
     if toggle == True:
         print('Turn On ',end='\r')
