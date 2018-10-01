@@ -15,7 +15,7 @@ DHT_VERSION = 11
 N_MEASUREMENTS = 3
 PRINT_SEPARATOR = ','
 
-TRIGGER_TEMPERATURE = 28
+TRIGGER_TEMPERATURE = 34
 
 # GPIO
 GPIO.setmode(GPIO.BCM)
@@ -44,31 +44,33 @@ def exit_gracefully(signum, frame):
 original_sigint = signal.getsignal(signal.SIGINT)
 signal.signal(signal.SIGINT, exit_gracefully)
 
-print('DateTime', 'Temperature[C]','Humidity[%]', sep=PRINT_SEPARATOR)
+print('DateTime', 'Temperature[C]','Humidity[%]','HeaterOn', sep=PRINT_SEPARATOR)
 while True:
 
     # 1: Read Sensor
     temperatures = []
     humidities = []
     for i in range(1,N_MEASUREMENTS+1):
-        print('Reading Sensor data: ',i, '/', N_MEASUREMENTS, '\r',end='',sep='')
         sys.stdout.flush()
         humidity, temperature = read_temperature()
         humidities.append(humidity)
         temperatures.append(temperature)
-    print('\r',end='')
+        # print('Reading Sensor data: ',i, '/', N_MEASUREMENTS, '\t', temperature, ' / ', humidity,'\r',end='',sep='')
+    # print('                                                     \r',end='')
 
     mean_temperature = np.average(temperatures)
     mean_humidity = np.average(humidities)
+    heater_on = mean_temperature < TRIGGER_TEMPERATURE;
 
     # 2: Print Measurement
     print( dt.datetime.now(),
           '{0:0.1f}'.format(mean_temperature),
           '{0:0.1f}'.format(mean_humidity),
+          '{0:0.1f}'.format(heater_on),
           sep=PRINT_SEPARATOR)
 
     # 3: Trun On/Off Warmer
-    if mean_temperature < TRIGGER_TEMPERATURE:
+    if heater_on:
         GPIO.output(WARMER_PIN, GPIO.HIGH)
     else:
         GPIO.output(WARMER_PIN, GPIO.LOW)
