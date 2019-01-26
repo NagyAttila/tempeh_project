@@ -15,7 +15,7 @@ DHT_VERSION = 11
 N_MEASUREMENTS = 3
 PRINT_SEPARATOR = ','
 
-TRIGGER_TEMPERATURE = 34
+TRIGGER_TEMPERATURE = 32
 
 # GPIO
 GPIO.setmode(GPIO.BCM)
@@ -52,9 +52,12 @@ while True:
     humidities = []
     for i in range(1,N_MEASUREMENTS+1):
         sys.stdout.flush()
-        humidity, temperature = read_temperature()
-        humidities.append(humidity)
-        temperatures.append(temperature)
+        try:
+            humidity, temperature = read_temperature()
+            humidities.append(humidity)
+            temperatures.append(temperature)
+        except Exception as e:
+            print('Connect Cables Properly!')
         # print('Reading Sensor data: ',i, '/', N_MEASUREMENTS, '\t', temperature, ' / ', humidity,'\r',end='',sep='')
     # print('                                                     \r',end='')
 
