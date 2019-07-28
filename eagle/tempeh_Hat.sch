@@ -5692,24 +5692,17 @@ Source: http://www.mouser.com/ds/2/392/products_18-2245.pdf</description>
 <nets>
 <net name="GND" class="0">
 <segment>
-<pinref part="K1" gate="G$1" pin="9"/>
 <pinref part="GND3" gate="1" pin="GND"/>
-<wire x1="43.18" y1="165.1" x2="40.64" y2="165.1" width="0.1524" layer="91"/>
-<wire x1="40.64" y1="165.1" x2="40.64" y2="144.78" width="0.1524" layer="91"/>
 <pinref part="K1" gate="G$1" pin="25"/>
 <wire x1="40.64" y1="144.78" x2="40.64" y2="127" width="0.1524" layer="91"/>
 <wire x1="40.64" y1="127" x2="40.64" y2="124.46" width="0.1524" layer="91"/>
 <wire x1="43.18" y1="144.78" x2="40.64" y2="144.78" width="0.1524" layer="91"/>
 <pinref part="K1" gate="G$1" pin="39"/>
 <wire x1="43.18" y1="127" x2="40.64" y2="127" width="0.1524" layer="91"/>
-<junction x="40.64" y="144.78"/>
 <junction x="40.64" y="127"/>
 </segment>
 <segment>
-<pinref part="K1" gate="G$1" pin="6"/>
 <pinref part="GND10" gate="1" pin="GND"/>
-<wire x1="58.42" y1="170.18" x2="60.96" y2="170.18" width="0.1524" layer="91"/>
-<wire x1="60.96" y1="170.18" x2="60.96" y2="160.02" width="0.1524" layer="91"/>
 <pinref part="K1" gate="G$1" pin="14"/>
 <wire x1="60.96" y1="160.02" x2="60.96" y2="152.4" width="0.1524" layer="91"/>
 <wire x1="60.96" y1="152.4" x2="60.96" y2="139.7" width="0.1524" layer="91"/>
@@ -5722,7 +5715,6 @@ Source: http://www.mouser.com/ds/2/392/products_18-2245.pdf</description>
 <wire x1="58.42" y1="139.7" x2="60.96" y2="139.7" width="0.1524" layer="91"/>
 <pinref part="K1" gate="G$1" pin="34"/>
 <wire x1="58.42" y1="134.62" x2="60.96" y2="134.62" width="0.1524" layer="91"/>
-<junction x="60.96" y="160.02"/>
 <junction x="60.96" y="152.4"/>
 <junction x="60.96" y="139.7"/>
 <junction x="60.96" y="134.62"/>
@@ -5751,10 +5743,6 @@ Source: http://www.mouser.com/ds/2/392/products_18-2245.pdf</description>
 <pinref part="+3V1" gate="G$1" pin="+3V3"/>
 <wire x1="43.18" y1="175.26" x2="38.1" y2="175.26" width="0.1524" layer="91"/>
 <wire x1="38.1" y1="175.26" x2="38.1" y2="180.34" width="0.1524" layer="91"/>
-<pinref part="K1" gate="G$1" pin="17"/>
-<wire x1="43.18" y1="154.94" x2="38.1" y2="154.94" width="0.1524" layer="91"/>
-<wire x1="38.1" y1="154.94" x2="38.1" y2="175.26" width="0.1524" layer="91"/>
-<junction x="38.1" y="175.26"/>
 </segment>
 <segment>
 <pinref part="+3V2" gate="G$1" pin="+3V3"/>
