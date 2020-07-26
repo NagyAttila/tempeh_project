@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 from __future__ import print_function
 
 import sys
@@ -9,13 +9,13 @@ import RPi.GPIO as GPIO
 import signal
 
 ## Setup
-TEMPERATURE_PIN = 4
-WARMER_PIN = 18
-DHT_VERSION = 11
+DHT11_TEMPERATURE_PIN = 18
+WARMER_PIN = 14
+DHT11_VERSION = 11
 N_MEASUREMENTS = 3
 PRINT_SEPARATOR = ','
 
-TRIGGER_TEMPERATURE = 32
+TRIGGER_TEMPERATURE = 35
 
 # GPIO
 GPIO.setmode(GPIO.BCM)
@@ -23,10 +23,42 @@ GPIO.setwarnings(False)
 GPIO.setup(WARMER_PIN,GPIO.OUT)
 GPIO.output(WARMER_PIN, GPIO.LOW)
 
+# Temp Sensor
+import os
+import glob
+import time
+
+os.system('modprobe w1-gpio')
+os.system('modprobe w1-therm')
+
+base_dir = '/sys/bus/w1/devices/'
+device_folder = glob.glob(base_dir + '28*')[0]
+device_file = device_folder + '/w1_slave'
+
+def read_temp_raw():
+    f = open(device_file, 'r')
+    lines = f.readlines()
+    f.close()
+    return lines
+
+def read_temp():
+    lines = read_temp_raw()
+    while lines[0].strip()[-3:] != 'YES':
+        time.sleep(0.2)
+        lines = read_temp_raw()
+    equals_pos = lines[1].find('t=')
+    if equals_pos != -1:
+        temp_string = lines[1][equals_pos+2:]
+        temp_c = float(temp_string) / 1000.0
+        temp_f = temp_c * 9.0 / 5.0 + 32.0
+        return temp_c
 
 ## Functions
 def read_temperature():
-    return Adafruit_DHT.read_retry(DHT_VERSION, TEMPERATURE_PIN)
+    return read_temp()
+
+def read_dht11_temperature():
+    return Adafruit_DHT.read_retry(DHT11_VERSION, DHT11_TEMPERATURE_PIN)
 
 def exit_gracefully(signum, frame):
     # In case we get another SIGINT signal during this function
@@ -44,31 +76,35 @@ def exit_gracefully(signum, frame):
 original_sigint = signal.getsignal(signal.SIGINT)
 signal.signal(signal.SIGINT, exit_gracefully)
 
-print('DateTime', 'Temperature[C]','Humidity[%]','HeaterOn', sep=PRINT_SEPARATOR)
+print('DateTime', 'DS18B20-Temperature[C]', 'DHT11-Humidity[%]',
+      'Dht11-Temperature[%]', 'HeaterOn', sep=PRINT_SEPARATOR)
 while True:
 
     # 1: Read Sensor
     temperatures = []
-    humidities = []
+    dht11_humidities = []
+    dht11_temperatures = []
     for i in range(1,N_MEASUREMENTS+1):
         sys.stdout.flush()
         try:
-            humidity, temperature = read_temperature()
-            humidities.append(humidity)
+            temperature = read_temperature()
+            [dht11_humidity, dht11_temperature] = read_dht11_temperature()
+            dht11_humidities.append(dht11_humidity)
+            dht11_temperatures.append(dht11_temperature)
             temperatures.append(temperature)
         except Exception as e:
             print('Connect Cables Properly!')
-        # print('Reading Sensor data: ',i, '/', N_MEASUREMENTS, '\t', temperature, ' / ', humidity,'\r',end='',sep='')
-    # print('                                                     \r',end='')
 
     mean_temperature = np.average(temperatures)
-    mean_humidity = np.average(humidities)
+    mean_dht11_humidity = np.average(dht11_humidities)
+    mean_dht11_temperature = np.average(dht11_temperatures)
     heater_on = mean_temperature < TRIGGER_TEMPERATURE;
 
     # 2: Print Measurement
     print( dt.datetime.now(),
           '{0:0.1f}'.format(mean_temperature),
-          '{0:0.1f}'.format(mean_humidity),
+          '{0:0.1f}'.format(mean_dht11_humidity),
+          '{0:0.1f}'.format(mean_dht11_temperature),
           '{0:0.1f}'.format(heater_on),
           sep=PRINT_SEPARATOR)
 
