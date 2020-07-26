@@ -7,13 +7,15 @@ import numpy as np
 import datetime as dt
 import RPi.GPIO as GPIO
 import signal
+import time
 
 ## Setup
 DHT11_TEMPERATURE_PIN = 18
 WARMER_PIN = 14
 DHT11_VERSION = 11
-N_MEASUREMENTS = 3
+N_MEASUREMENTS = 10
 PRINT_SEPARATOR = ','
+MEASUREMENT_PERIOD = 60
 
 TRIGGER_TEMPERATURE = 35
 
@@ -77,8 +79,9 @@ original_sigint = signal.getsignal(signal.SIGINT)
 signal.signal(signal.SIGINT, exit_gracefully)
 
 print('DateTime', 'DS18B20-Temperature[C]', 'DHT11-Humidity[%]',
-      'Dht11-Temperature[%]', 'HeaterOn', sep=PRINT_SEPARATOR)
+      'Dht11-Temperature[C]', 'HeaterOn', sep=PRINT_SEPARATOR)
 while True:
+    start_time = time.time()
 
     # 1: Read Sensor
     temperatures = []
@@ -113,4 +116,10 @@ while True:
         GPIO.output(WARMER_PIN, GPIO.HIGH)
     else:
         GPIO.output(WARMER_PIN, GPIO.LOW)
+
+    end_time = time.time()
+    time_delta = (end_time - start_time)
+    if time_delta < MEASUREMENT_PERIOD:
+        time.sleep(MEASUREMENT_PERIOD - time_delta)
+
 
