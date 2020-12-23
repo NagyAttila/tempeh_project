@@ -17,7 +17,8 @@ N_MEASUREMENTS = 10
 PRINT_SEPARATOR = ','
 MEASUREMENT_PERIOD = 60
 
-TRIGGER_TEMPERATURE = 35
+MIN_TEMPERATURE = 32
+MAX_AIR_TEMPERATURE = 40
 
 # GPIO
 GPIO.setmode(GPIO.BCM)
@@ -77,11 +78,11 @@ def exit_gracefully(signum, frame):
 # replace SIGINT handler
 original_sigint = signal.getsignal(signal.SIGINT)
 signal.signal(signal.SIGINT, exit_gracefully)
+start_time = time.time()
 
 print('DateTime', 'DS18B20-Temperature[C]', 'DHT11-Humidity[%]',
       'Dht11-Temperature[C]', 'HeaterOn', sep=PRINT_SEPARATOR)
 while True:
-    start_time = time.time()
 
     # 1: Read Sensor
     temperatures = []
@@ -101,7 +102,8 @@ while True:
     mean_temperature = np.average(temperatures)
     mean_dht11_humidity = np.average(dht11_humidities)
     mean_dht11_temperature = np.average(dht11_temperatures)
-    heater_on = mean_temperature < TRIGGER_TEMPERATURE;
+
+    heater_on = mean_temperature < MIN_TEMPERATURE and mean_dht11_temperature < MAX_AIR_TEMPERATURE;
 
     # 2: Print Measurement
     print( dt.datetime.now(),
@@ -121,5 +123,6 @@ while True:
     time_delta = (end_time - start_time)
     if time_delta < MEASUREMENT_PERIOD:
         time.sleep(MEASUREMENT_PERIOD - time_delta)
+    start_time = time.time()
 
 
