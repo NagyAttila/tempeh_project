@@ -19,7 +19,7 @@ def exit_gracefully(signum, frame):
 
 
 ## Setup
-WARMER_PIN = 18
+WARMER_PIN = 14
 
 # GPIO
 GPIO.setmode(GPIO.BCM)
