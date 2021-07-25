@@ -42,4 +42,4 @@ while True:
         print('Turn Off',end='\r')
         GPIO.output(WARMER_PIN, GPIO.LOW)
         toggle = True
-    time.sleep(1)
+    time.sleep(5)

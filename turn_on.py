@@ -13,7 +13,7 @@ WARMER_PIN = 14
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 GPIO.setup(WARMER_PIN,GPIO.OUT)
-GPIO.output(WARMER_PIN, GPIO.LOW)
+# GPIO.output(WARMER_PIN, GPIO.LOW)
 
 ## Main
 print('Turn Off',end='\r')
