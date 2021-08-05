@@ -7,7 +7,7 @@ import signal
 import time
 
 ## Setup
-WARMER_PIN = 14
+WARMER_PIN = 15
 
 # GPIO
 GPIO.setmode(GPIO.BCM)

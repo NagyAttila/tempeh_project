@@ -11,7 +11,7 @@ import time
 import os
 
 ## Setup
-WARMER_PIN = 14
+WARMER_PIN = 15
 N_MEASUREMENTS = 10
 PRINT_SEPARATOR = ','
 MEASUREMENT_PERIOD = 60
@@ -72,7 +72,6 @@ def reboot():
 # replace SIGINT handler
 original_sigint = signal.getsignal(signal.SIGINT)
 signal.signal(signal.SIGINT, exit_gracefully)
-prev_heater_on = False
 
 print('DateTime', 'DS18B20-Temperature[C]', 'HeaterOn', sep=PRINT_SEPARATOR)
 while True:
@@ -98,7 +97,9 @@ while True:
     mean_temperature = np.average(temperatures)
 
     heater_on = mean_temperature < MIN_TEMPERATURE
-    prev_heater_on = heater_on
+    # k = 0.5 # 1 -> 1 Celsius , 0.5 -> 2 Celsius
+    # pwm = max( min( (MIN_TEMPERATURE-mean_temperature) * k, 0.5), 0)
+    pwm = 0.25
 
     # 2: Print Measurement
     print( dt.datetime.now(),
@@ -107,14 +108,18 @@ while True:
           sep=PRINT_SEPARATOR)
 
     # 3: Trun On/Off Warmer
-    if heater_on:
-        # Reverse logic due to opto-coupling
-        GPIO.output(WARMER_PIN, GPIO.LOW)
-    else:
-        GPIO.output(WARMER_PIN, GPIO.HIGH)
-
     end_time = time.time()
     time_delta = (end_time - start_time)
     if time_delta < MEASUREMENT_PERIOD:
-        time.sleep(MEASUREMENT_PERIOD - time_delta)
+
+        if heater_on:
+            # Reverse logic due to opto-coupling
+            GPIO.output(WARMER_PIN, GPIO.LOW)
+            time.sleep((MEASUREMENT_PERIOD - time_delta) * pwm)
+            GPIO.output(WARMER_PIN, GPIO.HIGH)
+            time.sleep((MEASUREMENT_PERIOD - time_delta) * (1-pwm))
+        else:
+            GPIO.output(WARMER_PIN, GPIO.HIGH)
+            time.sleep(MEASUREMENT_PERIOD - time_delta)
+
 
